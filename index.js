@@ -5,7 +5,7 @@ const mongo = 'mongodb://apollo:apollo123@ds215822.mlab.com:15822/apolloserver'
 
 import * as BookType from './src/modules/book/BookType';
 import * as AuthorType from './src/modules/author/AuthorType';
-import Books from './src/mongo/index'
+import {Books} from './src/mongo/index'
 
 const SchemaDefinition = gql`
   schema {
@@ -32,7 +32,11 @@ const resolvers = {
     ...AuthorType.resolvers
   },
   Mutation: {
-    addBook: (root, args, { Books }) => Books.create(args)
+    addBook: (root, args, { Books }) => {
+      const book = new Books(args)
+      book.save()
+      return book
+    }
   }
 };
 
