@@ -1,4 +1,5 @@
 import * as AuthorLoader from './AuthorLoader';
+import Author from './AuthorModel'
 
 export const typeDefs = `
   type Author {
@@ -8,5 +9,8 @@ export const typeDefs = `
 `;
 
 export const resolvers = {
-  authors: () => AuthorLoader.loadAllAuthors(),
+  // authors: () => AuthorLoader.loadAllAuthors(),
+  allAuthors: () => Author.find(),
+  author: (name) => Author.findOne(name),
+
 };

@@ -5,7 +5,8 @@ const mongo = 'mongodb://apollo:apollo123@ds215822.mlab.com:15822/apolloserver'
 
 import * as BookType from './src/modules/book/BookType';
 import * as AuthorType from './src/modules/author/AuthorType';
-import {Books} from './src/mongo/index'
+import Books from "./src/modules/book/BookModel";
+import Author from "./src/modules/author/authorModel";
 
 const SchemaDefinition = gql`
   schema {
@@ -13,11 +14,14 @@ const SchemaDefinition = gql`
     mutation: Mutation
   }
   type Query {
-    books: [Book]
-    authors: [Author]
+    allBooks: [Book]
+    book(title: String!): Book
+    allAuthors: [Author]
+    author(name: String!): Author
   }
   type Mutation {
-    addBook(title: String!, author: String!): Book!
+    addBook(title: String!, author: Author!): Book!
+    addAuthor(name: String!, age: Int!): Author!
   }
 `;
 
@@ -33,9 +37,22 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args, { Books }) => {
-      const book = new Books(args)
-      book.save()
-      return book
+      Author.findOne({ _id: args.author.name }, (err, author) => {
+        if(!author){
+          const author = new Author(args.author);
+          author.save();
+          return author;
+        }
+      })
+
+      const book = new Books(args);
+      book.save();
+      return book;
+    },
+    addAuthor: (root, args, { Author }) => {
+      const author = new Author(args);
+      author.save();
+      return author;
     }
   }
 };
@@ -47,7 +64,7 @@ const schema = makeExecutableSchema({
 
 const server = new ApolloServer({
   schema, context: ({ req }) => ({
-    Books
+    Books, Author
   })
 });
 
