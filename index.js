@@ -20,8 +20,10 @@ const SchemaDefinition = gql`
     author(name: String!): Author
   }
   type Mutation {
-    addBook(title: String!, author: Author!): Book!
-    addAuthor(name: String!, age: Int!): Author!
+    addBook(title: String!, author: AuthorInput!): Book
+    addAuthor(name: String!, age: Int!): Author
+    removeBook(title:String!): [Book]
+    removeAuthor(name:String!): [Author]
   }
 `;
 
@@ -37,8 +39,10 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args, { Books }) => {
-      Author.findOne({ _id: args.author.name }, (err, author) => {
-        if(!author){
+      console.log(args);
+
+      Author.findOne({ name: args.author.name }, (err, author) => {
+        if (!author) {
           const author = new Author(args.author);
           author.save();
           return author;
@@ -53,6 +57,17 @@ const resolvers = {
       const author = new Author(args);
       author.save();
       return author;
+    },
+    removeBook: (root, args, {Books}) => {
+      Books.findOneAndDelete(args).then((docs) => {
+        console.log(docs);
+      })
+      Books.find();
+      
+    },
+    removeAuthor: (root, args, {Author}) => {
+      console.log(args)
+      Author.findOneAndRemove({ name: args.author.name });
     }
   }
 };
