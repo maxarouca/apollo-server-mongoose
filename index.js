@@ -39,7 +39,6 @@ const resolvers = {
   },
   Mutation: {
     addBook: (root, args, { Books }) => {
-      console.log(args);
 
       Author.findOne({ name: args.author.name }, (err, author) => {
         if (!author) {
@@ -59,15 +58,13 @@ const resolvers = {
       return author;
     },
     removeBook: (root, args, {Books}) => {
-      Books.findOneAndDelete(args).then((docs) => {
-        console.log(docs);
-      })
-      Books.find();
-      
+      Books.deleteOne(args, function (err) { console.log(err)});
     },
     removeAuthor: (root, args, {Author}) => {
-      console.log(args)
-      Author.findOneAndRemove({ name: args.author.name });
+      console.log(args);
+      Author.deleteOne(args, function(err) {
+        console.log(err);
+      });
     }
   }
 };
